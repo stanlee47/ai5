@@ -1,0 +1,59 @@
+JENKINS + DOCKER CHEAT SHEET
+
+1) docker-compose.yml
+---------------------
+version: '3.8'
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    restart: unless-stopped
+
+volumes:
+  jenkins_home:
+
+2) Start Jenkins
+----------------
+docker compose up -d
+
+3) Get initial admin password
+-----------------------------
+docker exec -it jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+
+4) Jenkins setup
+----------------
+- Open http://localhost:8080
+- Install suggested plugins
+- Create admin user
+
+5) Install plugin
+-----------------
+Manage Jenkins → Manage Plugins → Available → HTML Publisher Plugin → Install
+
+6) Freestyle Job
+----------------
+Build → Execute Shell:
+mkdir -p site
+cat > site/index.html <<'EOF'
+<!doctype html>
+<html>
+  <head><meta charset="utf-8"><title>Simple HTML Site</title></head>
+  <body>
+    <h1>Welcome to Jenkins Static Site</h1>
+  </body>
+</html>
+EOF
+
+Post-build → Publish HTML reports:
+- HTML directory: site
+- Index: index.html
+- Title: Simple HTML Site
+
+7) Build & View
+---------------
+Build Now → open build → Simple HTML Site
